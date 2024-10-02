@@ -28,7 +28,7 @@ jobs:
       run: |
         set -eux
         jlpm
-        jlpm run lint:check -- --ignore-pattern "README.md" --ignore-pattern "docs/**/*"
+        jlpm run lint:check
 
     - name: Test the extension
       run: |

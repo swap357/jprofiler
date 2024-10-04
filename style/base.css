@@ -51,6 +51,7 @@
     background-color: var(--jp-brand-color1);
     color: var(--jp-ui-inverse-font-color1);
   }
+
   100% {
     background-color: transparent;
     color: var(--jp-ui-font-color1);

@@ -10,7 +10,6 @@ node_modules/
 jprofiler/labextension
 # Version file is handled by hatchling
 jprofiler/_version.py
-
 # Integration tests
 ui-tests/test-results/
 ui-tests/playwright-report/
@@ -123,3 +122,4 @@ dmypy.json
 
 # Yarn cache
 .yarn/
+

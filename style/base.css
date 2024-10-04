@@ -3,3 +3,95 @@
 
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
+/* Transition to highlight a cell change */
+@keyframes executeHighlight {
+    from {
+      background-color: var(--md-blue-100, #9fccff);
+    }
+    to {
+      background-color: var(--jp-cell-editor-background);
+    }
+  }
+  
+  
+  .jp-Cell-inputWrapper:hover {
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: -1.25em;
+    border: 1px solid var(--jp-cell-editor-border-color, #cfcfcf);
+    border-width: 0 1px 1px 1px;
+    height: 1.25em;
+    z-index: 3;
+  }
+
+  
+.jp-MemoryUsage-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 5px;
+  font-size: 12px;
+  font-family: var(--jp-ui-font-family);
+  color: var(--jp-ui-font-color1);
+}
+
+.jp-MemoryUsage-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.jp-MemoryUsage-label {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.jp-MemoryUsage-value {
+  font-family: var(--jp-code-font-family);
+}
+
+.jp-MemoryUsage-highlight {
+  animation: memoryHighlight 1s ease-in-out;
+}
+
+@keyframes memoryHighlight {
+  0% {
+    background-color: var(--jp-brand-color1);
+    color: var(--jp-ui-inverse-font-color1);
+  }
+  100% {
+    background-color: transparent;
+    color: var(--jp-ui-font-color1);
+  }
+}
+
+/* Positioning styles */
+.jp-MemoryUsage-left {
+  float: left;
+  clear: left;
+}
+
+.jp-MemoryUsage-right {
+  float: right;
+  clear: right;
+}
+
+.jp-MemoryUsage-hover {
+  position: absolute;
+  z-index: 1000;
+  background-color: var(--jp-layout-color1);
+  border: 1px solid var(--jp-border-color1);
+  border-radius: 3px;
+  padding: 5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Text contrast styles */
+.jp-MemoryUsage-contrast-high {
+  color: var(--jp-ui-font-color0);
+}
+
+.jp-MemoryUsage-contrast-low {
+  color: var(--jp-ui-font-color2);
+}

@@ -5,14 +5,17 @@ import {
 import {
   INotebookTracker,
   INotebookModel,
-  NotebookPanel,
+  NotebookPanel
 } from '@jupyterlab/notebook';
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import MemoryUsageWidget from './MemoryUsageWidget';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 class MemoryUsageWidgetExtension implements DocumentRegistry.WidgetExtension {
-  constructor(tracker: INotebookTracker, settings: ISettingRegistry.ISettings | null) {
+  constructor(
+    tracker: INotebookTracker,
+    settings: ISettingRegistry.ISettings | null
+  ) {
     this._settings = settings!;
     this._tracker = tracker;
   }
@@ -23,16 +26,16 @@ class MemoryUsageWidgetExtension implements DocumentRegistry.WidgetExtension {
   ) {
     return new MemoryUsageWidget(panel, this._tracker, this._settings!);
   }
-  
+
   private _settings: ISettingRegistry.ISettings;
   private _tracker: INotebookTracker;
 }
 
 function loadIPythonExtension(notebook: NotebookPanel) {
   console.log('Attempting to load IPython extension');
-  
+
   const sessionContext = notebook.sessionContext;
-  
+
   if (sessionContext.session?.kernel) {
     _loadExtension(sessionContext.session.kernel);
   } else {
@@ -49,11 +52,14 @@ async function _loadExtension(kernel: any) {
     const response = await kernel.requestExecute({
       code: '%load_ext jprofiler.miniprofiler'
     }).done;
-    
+
     if (response.content.status === 'ok') {
       console.log('MiniProfiler IPython extension loaded successfully');
     } else {
-      console.error('Failed to load MiniProfiler IPython extension:', response.content);
+      console.error(
+        'Failed to load MiniProfiler IPython extension:',
+        response.content
+      );
     }
   } catch (error) {
     console.error('Error loading MiniProfiler IPython extension:', error);
@@ -87,7 +93,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     });
 
     // Also load for any existing notebooks
-    notebookTracker.forEach((notebook) => {
+    notebookTracker.forEach(notebook => {
       loadIPythonExtension(notebook);
     });
 

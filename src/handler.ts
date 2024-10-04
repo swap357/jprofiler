@@ -47,12 +47,13 @@ export async function requestAPI<T>(
 
 /**
  * Test the memory profiler endpoint
- * 
+ *
  * @returns The memory usage data
  */
 export async function testMemoryProfiler(): Promise<any> {
-  const sampleCode = 'a = [0] * 1000000  # Create a list with 1 million elements';
-  
+  const sampleCode =
+    'a = [0] * 1000000  # Create a list with 1 million elements';
+
   console.log('Sending request to memory-profile endpoint');
   try {
     const data = await requestAPI<any>('telemetry', {

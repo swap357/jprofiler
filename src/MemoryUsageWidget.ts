@@ -1,8 +1,5 @@
 import { Widget } from '@lumino/widgets';
-import {
-  NotebookPanel,
-  INotebookTracker,
-} from '@jupyterlab/notebook';
+import { NotebookPanel, INotebookTracker } from '@jupyterlab/notebook';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { Cell, CodeCell, ICodeCellModel } from '@jupyterlab/cells';
 import { OutputArea } from '@jupyterlab/outputarea';
@@ -30,7 +27,7 @@ export default class MemoryUsageWidget extends Widget {
   ) {
     super();
     this._panel = panel;
-    
+
     // Initialize _settings in the constructor
     this._settings = this._getSettingsValues(settings);
     settings.changed.connect(this._updateSettings.bind(this));
@@ -38,17 +35,19 @@ export default class MemoryUsageWidget extends Widget {
     if (panel.content && panel.content.model) {
       panel.content.model.cells.changed.connect((sender, args) => {
         if (args.type === 'add') {
-          args.newValues.forEach((cell) => {
+          args.newValues.forEach(cell => {
             if (cell.type === 'code') {
-              (cell as ICodeCellModel).outputs.changed.connect((sender) => {
+              (cell as ICodeCellModel).outputs.changed.connect(sender => {
                 console.log('outputs changed');
-                const outputArea = (this._panel.content.widgets.find(
-                  (widget) => widget.model === cell
-                ) as CodeCell).outputArea;
+                const outputArea = (
+                  this._panel.content.widgets.find(
+                    widget => widget.model === cell
+                  ) as CodeCell
+                ).outputArea;
                 outputArea.model.changed.connect((model, args) => {
                   console.log('outputArea.model.changed', args);
                   if (args.type === 'add') {
-                    args.newValues.forEach((output) => {
+                    args.newValues.forEach(output => {
                       this._handleOutput(outputArea, output);
                     });
                   }
@@ -77,8 +76,10 @@ export default class MemoryUsageWidget extends Widget {
 
   private _updateCellWithMemoryUsage(cell: Cell, profData: any) {
     const memoryUsage = profData.memory_usage.toFixed(2);
-    let memoryUsageNode = cell.node.querySelector(`.${MEMORY_USAGE_CLASS}`) as HTMLElement;
-    
+    let memoryUsageNode = cell.node.querySelector(
+      `.${MEMORY_USAGE_CLASS}`
+    ) as HTMLElement;
+
     if (!memoryUsageNode) {
       memoryUsageNode = document.createElement('div');
       memoryUsageNode.className = MEMORY_USAGE_CLASS;
@@ -101,7 +102,9 @@ export default class MemoryUsageWidget extends Widget {
     this._settings = this._getSettingsValues(settings);
   }
 
-  private _getSettingsValues(settings: ISettingRegistry.ISettings): IMemoryUsageSettings {
+  private _getSettingsValues(
+    settings: ISettingRegistry.ISettings
+  ): IMemoryUsageSettings {
     return {
       enabled: settings.get('enabled').composite as boolean,
       highlight: settings.get('highlight').composite as boolean,

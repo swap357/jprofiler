@@ -80,7 +80,7 @@ export default class MemoryUsageWidget extends Widget {
     const parallelization = profData.parallelization.toFixed(4);
     const cpuUtilization = profData.cpu_utilization.toFixed(4);
     const amdahlSpeedup = profData.amdahl_speedup.toFixed(4);
-    const uslSpeedup = profData.usl_speedup.toFixed(4);
+
     let memoryUsageNode = cell.node.querySelector(
       `.${MEMORY_USAGE_CLASS}`
     ) as HTMLElement;
@@ -93,7 +93,7 @@ export default class MemoryUsageWidget extends Widget {
 
     memoryUsageNode.textContent = `Memory: ${memoryUsage} MB, cpuTime: ${cpuTime} s, 
     Duration: ${duration} s, Parallelization: ${parallelization}, CPU Utilization: ${cpuUtilization}, 
-    Amdahl Speedup: ${amdahlSpeedup}, USL Speedup: ${uslSpeedup}`;
+    Amdahl Speedup: ${amdahlSpeedup}`;
   }
 
   private _panel: NotebookPanel;

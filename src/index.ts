@@ -12,11 +12,7 @@ import MemoryUsageWidget from './MemoryUsageWidget';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 class MemoryUsageWidgetExtension implements DocumentRegistry.WidgetExtension {
-  constructor(
-    tracker: INotebookTracker,
-    settings: ISettingRegistry.ISettings | null
-  ) {
-    this._settings = settings!;
+  constructor(tracker: INotebookTracker) {
     this._tracker = tracker;
   }
 
@@ -24,10 +20,9 @@ class MemoryUsageWidgetExtension implements DocumentRegistry.WidgetExtension {
     panel: NotebookPanel,
     context: DocumentRegistry.IContext<INotebookModel>
   ) {
-    return new MemoryUsageWidget(panel, this._tracker, this._settings!);
+    return new MemoryUsageWidget(panel, this._tracker);
   }
 
-  private _settings: ISettingRegistry.ISettings;
   private _tracker: INotebookTracker;
 }
 
@@ -78,15 +73,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
   ) => {
     console.log('JupyterLab extension jprofiler is activated!');
 
-    let settings: ISettingRegistry.ISettings | null = null;
-    try {
-      settings = await settingRegistry.load('jprofiler:settings');
-    } catch (err: unknown) {
-      console.error(
-        `jprofiler: Could not load settings, so did not activate jprofiler: ${err}`
-      );
-    }
-
     // Load the IPython extension for each new notebook
     notebookTracker.widgetAdded.connect((_, notebook) => {
       loadIPythonExtension(notebook);
@@ -99,7 +85,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
     app.docRegistry.addWidgetExtension(
       'Notebook',
-      new MemoryUsageWidgetExtension(notebookTracker, settings)
+      new MemoryUsageWidgetExtension(notebookTracker)
     );
   }
 };

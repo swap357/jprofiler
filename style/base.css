@@ -4,87 +4,47 @@
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
 
-/* Transition to highlight a cell change */
-
-.jp-Cell-inputWrapper:hover {
+.memory-usage {
   display: block;
   position: absolute;
   right: 0;
-  bottom: -1.25em;
+
+  /* bottom: 0; Changed from -1.25em to 0 */
   border: 1px solid var(--jp-cell-editor-border-color, #cfcfcf);
-  border-width: 0 1px 1px;
+
+  /* border-width: 0 1px 1px; */
   height: 1.25em;
   z-index: 3;
-}
-
-.jp-MemoryUsage-widget {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 5px;
   font-size: 12px;
   font-family: var(--jp-ui-font-family);
   color: var(--jp-ui-font-color1);
-}
-
-.jp-MemoryUsage-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 3px;
-}
-
-.jp-MemoryUsage-label {
-  font-weight: bold;
-  margin-right: 5px;
-}
-
-.jp-MemoryUsage-value {
-  font-family: var(--jp-code-font-family);
-}
-
-.jp-MemoryUsage-highlight {
-  animation: memory-highlight 1s ease-in-out;
-}
-
-@keyframes memory-highlight {
-  0% {
-    background-color: var(--jp-brand-color1);
-    color: var(--jp-ui-inverse-font-color1);
-  }
-
-  100% {
-    background-color: transparent;
-    color: var(--jp-ui-font-color1);
-  }
+  background-color: var(--jp-layout-color1);
+  padding: 2px 5px;
+  margin-bottom: 2px; /* Added margin to separate from the next cell */
 }
 
 /* Positioning styles */
 
-.jp-MemoryUsage-left {
-  float: left;
-  clear: left;
+.memory-usage-left {
+  left: 0;
+  right: auto;
 }
 
-.jp-MemoryUsage-right {
-  float: right;
-  clear: right;
-}
-
-.jp-MemoryUsage-hover {
-  position: absolute;
-  z-index: 1000;
-  background-color: var(--jp-layout-color1);
-  border: 1px solid var(--jp-border-color1);
-  border-radius: 3px;
-  padding: 5px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+.memory-usage-right {
+  right: 0;
+  left: auto;
 }
 
 /* Text contrast styles */
-.jp-MemoryUsage-contrast-high {
+.memory-usage-contrast-high {
   color: var(--jp-ui-font-color0);
 }
 
-.jp-MemoryUsage-contrast-low {
+.memory-usage-contrast-low {
   color: var(--jp-ui-font-color2);
+}
+
+/* Add some space below the cell to accommodate the memory usage widget */
+.jp-Cell {
+  margin-bottom: 1.5em;
 }

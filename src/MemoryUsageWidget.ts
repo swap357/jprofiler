@@ -1,6 +1,5 @@
 import { Widget } from '@lumino/widgets';
 import { NotebookPanel, INotebookTracker } from '@jupyterlab/notebook';
-import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { Cell, CodeCell, ICodeCellModel } from '@jupyterlab/cells';
 import { OutputArea } from '@jupyterlab/outputarea';
 import { IOutputModel } from '@jupyterlab/rendermime';
@@ -8,66 +7,66 @@ import { IOutputModel } from '@jupyterlab/rendermime';
 export const PLUGIN_NAME = 'jprofiler';
 const MEMORY_USAGE_CLASS = 'memory-usage';
 
-// How long do we animate the color for
-const ANIMATE_TIME_MS = 1000;
-const ANIMATE_CSS = `memoryHighlight ${ANIMATE_TIME_MS}ms`;
-
 export interface IMemoryUsageSettings {
   enabled: boolean;
-  highlight: boolean;
   positioning: string;
   textContrast: string;
 }
 
 export default class MemoryUsageWidget extends Widget {
-  constructor(
-    panel: NotebookPanel,
-    tracker: INotebookTracker,
-    settings: ISettingRegistry.ISettings
-  ) {
+  constructor(panel: NotebookPanel, tracker: INotebookTracker) {
     super();
     this._panel = panel;
 
-    // Initialize _settings in the constructor
-    this._settings = this._getSettingsValues(settings);
-    settings.changed.connect(this._updateSettings.bind(this));
-
     if (panel.content && panel.content.model) {
-      panel.content.model.cells.changed.connect((sender, args) => {
-        if (args.type === 'add') {
-          args.newValues.forEach(cell => {
-            if (cell.type === 'code') {
-              (cell as ICodeCellModel).outputs.changed.connect(sender => {
-                console.log('outputs changed');
-                const outputArea = (
-                  this._panel.content.widgets.find(
-                    widget => widget.model === cell
-                  ) as CodeCell
-                ).outputArea;
-                outputArea.model.changed.connect((model, args) => {
-                  console.log('outputArea.model.changed', args);
-                  if (args.type === 'add') {
-                    args.newValues.forEach(output => {
-                      this._handleOutput(outputArea, output);
-                    });
-                  }
-                });
-              });
-            }
-          });
+      panel.content.model.cells.changed.connect(
+        this._handleCellsChanged.bind(this)
+      );
+    }
+  }
+
+  private _handleCellsChanged(sender: any, args: any) {
+    if (args.type === 'add') {
+      args.newValues.forEach((cell: any) => {
+        if (cell.type === 'code') {
+          this._setupOutputListener(cell);
         }
       });
     }
   }
 
+  private _setupOutputListener(cell: ICodeCellModel) {
+    cell.outputs.changed.connect((sender: any) => {
+      const outputArea = (
+        this._panel.content.widgets.find(
+          widget => widget.model === cell
+        ) as CodeCell
+      ).outputArea;
+
+      outputArea.model.changed.connect(
+        this._handleOutputAreaChanged.bind(this, outputArea)
+      );
+    });
+  }
+
+  private _handleOutputAreaChanged(
+    outputArea: OutputArea,
+    model: any,
+    args: any
+  ) {
+    if (args.type === 'add') {
+      args.newValues.forEach((output: IOutputModel) => {
+        this._handleOutput(outputArea, output);
+      });
+    }
+  }
+
   private _handleOutput(sender: OutputArea, output: IOutputModel) {
-    console.log('at _handleOutput', output);
     if (output.type === 'display_data') {
       const data = output.data as Record<string, any>;
-      console.log('data', data);
       if (data && data['application/vnd.miniprof+json']) {
         const profData = data['application/vnd.miniprof+json'] as any;
-        console.log('profData:', profData);
+        console.log('_handleOutput profData', profData);
         const cell = sender.parent as Cell;
         this._updateCellWithMemoryUsage(cell, profData);
       }
@@ -75,7 +74,13 @@ export default class MemoryUsageWidget extends Widget {
   }
 
   private _updateCellWithMemoryUsage(cell: Cell, profData: any) {
-    const memoryUsage = profData.memory_usage.toFixed(2);
+    const memoryUsage = profData.memory_usage.toFixed(4);
+    const cpuTime = profData.cpu_time.toFixed(4);
+    const duration = profData.duration.toFixed(4);
+    const parallelization = profData.parallelization.toFixed(4);
+    const cpuUtilization = profData.cpu_utilization.toFixed(4);
+    const amdahlSpeedup = profData.amdahl_speedup.toFixed(4);
+    const uslSpeedup = profData.usl_speedup.toFixed(4);
     let memoryUsageNode = cell.node.querySelector(
       `.${MEMORY_USAGE_CLASS}`
     ) as HTMLElement;
@@ -86,33 +91,10 @@ export default class MemoryUsageWidget extends Widget {
       cell.node.appendChild(memoryUsageNode);
     }
 
-    memoryUsageNode.textContent = `Memory: ${memoryUsage} MB`;
-
-    if (this._settings.highlight) {
-      memoryUsageNode.style.animation = ANIMATE_CSS;
-      setTimeout(() => {
-        if (memoryUsageNode) {
-          memoryUsageNode.style.animation = '';
-        }
-      }, ANIMATE_TIME_MS);
-    }
+    memoryUsageNode.textContent = `Memory: ${memoryUsage} MB, cpuTime: ${cpuTime} s, 
+    Duration: ${duration} s, Parallelization: ${parallelization}, CPU Utilization: ${cpuUtilization}, 
+    Amdahl Speedup: ${amdahlSpeedup}, USL Speedup: ${uslSpeedup}`;
   }
 
-  private _updateSettings(settings: ISettingRegistry.ISettings) {
-    this._settings = this._getSettingsValues(settings);
-  }
-
-  private _getSettingsValues(
-    settings: ISettingRegistry.ISettings
-  ): IMemoryUsageSettings {
-    return {
-      enabled: settings.get('enabled').composite as boolean,
-      highlight: settings.get('highlight').composite as boolean,
-      positioning: settings.get('positioning').composite as string,
-      textContrast: settings.get('textContrast').composite as string
-    };
-  }
-
-  private _settings: IMemoryUsageSettings;
   private _panel: NotebookPanel;
 }
